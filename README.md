@@ -45,13 +45,92 @@ eslint
 
 
 
+## Hook 14가지
+
+- [useState](#useState) - state 변경 
+- [useTitle](#useTitle) - title 변경
+
+- [useInput](#useInput) - input 상태, 검증 
+- [usePageLeave](#usePageLeave)
+- [useClick](#useClick)
+- [useFadeIn](#useFadeIn)
+- [useFullscreen](#useFullscreen)
+- [useHover](#useHover)
+- [useNetwork](#useNetwork)
+- [useNotification](#useNotification)
+- [useScroll](#useScroll)
+- [useTabs](#useTabs)
+- [usePreventLeave](#usePreventLeave)
+- [useConfirm](#useConfirm)
+- [useAxios](#useAxios)
 
 
-### useInput
+
+## useState
+
+```react
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+function App() {
+  const [item, setItem] = useState(0);
+  let increase = () => {
+    setItem(item + 1);
+  };
+  let decrease = () => {
+    setItem(item - 1);
+  };
+  return (
+    <div>
+      my number : {item} <br />
+      <button onClick={increase}>Plus</button>
+      <button onClick={decrease}>Minus</button>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+	
+```
 
 
 
-[useInput](#useInput)
+## useTitle
+
+
+
+
 
 ## useinput
+
+```react
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+
+const useInput = initialValue => {
+    const [value, setValue] = useState(initialValue);
+    const onChange = event => {
+        console.log(event.target);
+    };
+    return { value, onChange };
+}
+
+const App = () => {
+    const name = useInput("Mr.");
+    return (
+        <div className = "App">
+            <input placeholder="Name" {...name}/>
+        </div>
+    );
+};
+
+
+```
+
+
+
+
 
