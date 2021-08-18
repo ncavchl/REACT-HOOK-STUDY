@@ -63,6 +63,14 @@ eslint
 
 2️⃣**리액트 함수 컴포넌트 내에서만 호출이 가능**하며, 일반 자바스크립트 함수 안에서는 호출하면 안됨 (custom hook에서는 가능)
 
+#### useEffect, useState 사용 
+
+
+
+
+
+
+
 
 
 ## Hook 만든 이유
@@ -152,41 +160,290 @@ ReactDOM.render(<App />, document.getElementById("root"));
 
 
 
-## useTitle
-
-
-
-
-
 ## useinput
 
+- useState
+
 ```react
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
 
-
-const useInput = initialValue => {
-    const [value, setValue] = useState(initialValue);
-    const onChange = event => {
-        console.log(event.target);
-    };
-    return { value, onChange };
+function useInput (element, validator){
+  const [ value, setValue ] = useState(element);
+  const onChange = event => {
+    const  {target : {value}} = event;
+    let willUpdate = validator(value);
+    if(willUpdate) {
+      setValue(value);
+    }
+  }
+  return {value, onChange}
+}
+function App() {
+  const maxLength = (value)=> {
+    return (value.length <= 10); 
+    // return (!value.includes("#"));
+  }
+  const name = useInput("Mr.", maxLength);
+  return (
+    <div>
+      <input placeholder="Name" {...name}/>
+    </div>
+  );
 }
 
-const App = () => {
-    const name = useInput("Mr.");
-    return (
-        <div className = "App">
-            <input placeholder="Name" {...name}/>
-        </div>
-    );
-};
-
+ReactDOM.render(<App />, document.getElementById('root'));
 
 ```
 
 
 
 
+
+## usePageLeave
+
+
+
+## useTabs
+
+- useState
+
+```react
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const content = [
+  {
+    tab: "Section 1",
+    content: "I'm the content of the Section1",
+  },
+  {
+    tab: "Section 2",
+    content: "I'm the content of the Section2",
+  },
+];
+
+const useTabs = (indexTab, allTabs) => {
+  const [currentIndex, setCurrentIndex] = useState(indexTab);
+  return {
+    currentItem: allTabs[currentIndex],
+    changeItem: setCurrentIndex,
+  };
+};
+
+const App = () => {
+  const { currentItem, changeItem } = useTabs(0, content);
+  return (
+    <div className="App">
+      {content.map((section, index) => (
+        <button onClick={() => changeItem(index)} key={index}>
+          {section.tab}
+        </button>
+      ))}
+      <div>{currentItem.content}</div>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useEffect
+
+### ComponentDidMount, ComponentWillUnMount, ComponentDidUpdate
+
+version1
+
+```react
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const App = () => {
+  const sayHello = () => console.log("hello");
+  useEffect(() => {
+    sayHello();
+  });
+
+  const [number, setNumber] = useState(0);
+  const [aNumber, setAnumber] = useState(0);
+
+  return (
+    <div className="App">
+      <div>Hello</div>
+      <button onClick={() => setNumber(number + 1)}>{number}</button>
+      <button onClick={() => setAnumber(aNumber + 1)}>{aNumber}</button>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+version2
+
+```react
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const App = () => {
+  const sayHello = () => console.log("hello");
+
+  const [number, setNumber] = useState(0);
+  const [aNumber, setAnumber] = useState(0);
+  useEffect(sayHello, [number]);
+
+  return (
+    <div className="App">
+      <div>Hello</div>
+      <button onClick={() => setNumber(number + 1)}>{number}</button>
+      <button onClick={() => setAnumber(aNumber + 1)}>{aNumber}</button>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+
+
+
+
+## useTitle
+
+- useEffect
+
+```useTitle
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+
+const useTitle = (initialTitle) => {
+  const [title, setTitle] = useState(initialTitle);
+  const updateTitle = () => {
+    const htmlTitle = document.querySelector("title");
+    htmlTitle.innerText = title;
+  }
+  useEffect(updateTitle, [title]);
+  return setTitle;
+}
+
+const App = () => {
+  const titleUpdater = useTitle("Loading...");
+  setTimeout(() => titleUpdater("Home"), 5000); //5초뒤에 title을 home으로 변경
+  return(
+    <div className="App">
+      <div>Hello</div>
+    </div>
+  )
+};
+
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+
+
+
+
+## useClick
+
+useEffect
+
+* useRef
+
+  ```react
+  import React, { useRef } from 'react';
+  import ReactDOM from 'react-dom';
+  import './index.css';
+  
+  
+  
+  const App = () => {
+    const potato = useRef();
+    // setTimeout(() => console.log(potato), 4000); //log를 이용해서 potato에 어떤게 입력되는지 확인한다.
+    setTimeout(() => potato.current.focus(), 4000); //4초뒤에 input창으로 focus가 잡힌다.
+    return(
+      <div className="App">
+        <div>Hello</div>
+        <input ref={potato} placeholder="1" />
+      </div>
+    )
+  };
+  
+  
+  ReactDOM.render(<App />, document.getElementById('root'));
+  ```
+
+  
+
+
+
+```
+import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+
+const useClick = (onClick) =>{
+  const element = useRef(); 
+  useEffect(() => {
+    if(element.current){
+      element.current.addEventListener("click", onClick);
+    }
+    //step2 시작
+    return () => {
+      if(element.current){
+        element.current.removeEventListener("click", onClick)}
+      }
+  }, [] );
+  //step2 끝
+  return element;
+} 
+
+const App = () => {
+  const sayHello = () => console.log("sayHello");
+  
+  const title = useClick(sayHello);
+  return(
+    <div className="App">
+      <h1 ref={title}>Hello</h1>
+      
+    </div>
+  )
+};
+
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+
+
+
+
+## useHover
+
+
+
+
+
+
+
+## useConfirm
+
+useEffect
+
+```
+```
 
