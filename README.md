@@ -45,24 +45,80 @@ eslint
 
 
 
+## Hook 이란?
+
+✔️함수 컴포넌트에서 React state와 Lifecycle 기능을 연동할 수 있게 해주는 함수 (버전 16.8부터 도입)
+
+✔️만들어진 목적 자체가 함수 컴포넌트에서 사용하기 위함이었으니 당연히 클래스 컴포넌트 안에서는 동작하지 않음
+
+✔️기존에 함수 컴포넌트를 사용하다가 state를 추가하고 싶어서 클래스 컴포넌트로 바꾸곤 했는데 이제 그럴 필요가 없다
+
+
+
+## Hook 사용 규칙
+
+**1️⃣최상위에서만 Hook 호출이 가능** (루프, 조건문, 중첩된 함수 안에서는 사용할 수 없음) : 조건문을 Hook 내부에 넣는 것은 괜찮음
+
+-> 컴포넌트가 렌더링 될 때마다 항상 동일한 순서로 Hook이 호출되는 것이 보장되어 state를 올바르게 유지할 수 있음
+
+2️⃣**리액트 함수 컴포넌트 내에서만 호출이 가능**하며, 일반 자바스크립트 함수 안에서는 호출하면 안됨 (custom hook에서는 가능)
+
+
+
+## Hook 만든 이유
+
+**☑️컴포넌트들 사이에서 상태 로직을 재사용하는 것의 어려움**
+
+ \- higher-order component는 코드 추적이 어렵고 ‘wrapper hell’
+
+ \- Hook은 컴포넌트의 계층을 바꾸지 않고 상태 로직을 재사용할 수 있음
+
+ 
+
+**☑️복잡한 컴포넌트는 이해하기 어려움**
+
+ \- 여러 Lifecycle 메소드들이 관련 없는 로직들과 섞여 있음 
+
+ \- 그래서 버그가 자주 발생하고 무결성 유지가 어려움
+
+ 
+
+**☑️ Class 컴포넌트는 인간과 기계 모두를 혼란스럽게 함**
+
+ \- 리액트의 진입장벽
+
+ \- 코드가 장황해짐
+
+ \- Class 없이 React 기능을 사용해보자! -> **Hook**
+
+
+
+#### https://hocheon.tistory.com/79 참고
+
+
+
+
+
+
+
 ## Hook 14가지
 
 - [useState](#useState) - state 변경 
 - [useTitle](#useTitle) - title 변경
 
 - [useInput](#useInput) - input 상태, 검증 
-- [usePageLeave](#usePageLeave)
-- [useClick](#useClick)
-- [useFadeIn](#useFadeIn)
-- [useFullscreen](#useFullscreen)
-- [useHover](#useHover)
-- [useNetwork](#useNetwork)
-- [useNotification](#useNotification)
-- [useScroll](#useScroll)
-- [useTabs](#useTabs)
-- [usePreventLeave](#usePreventLeave)
-- [useConfirm](#useConfirm)
-- [useAxios](#useAxios)
+- [usePageLeave](#usePageLeave) - user가 page를 벗어나는 시점 발견하여 함수실행
+- [useClick](#useClick)  - element 를 click 하는 시점 발견
+- [useFadeIn](#useFadeIn) - element 에 fade 애니메이션 적용
+- [useFullscreen](#useFullscreen) - element를 full screen 으로 만들거나 일반 화면으로 돌아가게 함
+- [useHover](#useHover) - 마우스 hover 시 
+- [useNetwork](#useNetwork) - online, offline 상태 감지
+- [useNotification](#useNotification) - notififacion api 사용시 user에게 알림 보냄
+- [useScroll](#useScroll) - scroll 시 감지
+- [useTabs](#useTabs) - tab 사용 쉽도록
+- [usePreventLeave](#usePreventLeave) - user가 변경사항이나 저장하지 않고 페이지를 벗어날때 확인하는 것
+- [useConfirm](#useConfirm) - usePreventLeave와 비슷 
+- [useAxios](#useAxios) - HTTP requests clients axois 를 위한 wrapper 같은 것
 
 
 
