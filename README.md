@@ -115,7 +115,7 @@ eslint
 - [useTitle](#useTitle) - title 변경
 
 - [useInput](#useInput) - input 상태, 검증 
-- [usePageLeave](#usePageLeave) - user가 page를 벗어나는 시점 발견하여 함수실행
+- [useBeforeLeave](#useBeforeLeave) - user가 page를 벗어나는 시점 발견하여 함수실행
 - [useClick](#useClick)  - element 를 click 하는 시점 발견
 - [useFadeIn](#useFadeIn) - element 에 fade 애니메이션 적용
 - [useFullscreen](#useFullscreen) - element를 full screen 으로 만들거나 일반 화면으로 돌아가게 함
@@ -442,7 +442,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ## useConfirm
 
-useEffect
+
 
 ```react
 import React from 'react';
@@ -489,7 +489,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ## usePreventLeave
 
-useEffect
+
 
 ```react
 import React from "react";
@@ -518,6 +518,408 @@ const App = () => {
   );
 };
 
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useBeforeLeave
+
+useEffect
+
+```react
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const useBeforeLeave = (onBefore) => {
+  const handleLeave = (e) => {
+    const { clientY } = e;
+    if (clientY <= 0) {
+      onBefore();
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mouseleave", handleLeave);
+    return () => document.removeEventListener("mouseleave", handleLeave);
+  }, []);
+  if (typeof onBefore !== "function") {
+    return;
+  }
+};
+
+//마우스가 페이지를 벗어날 시에
+const App = () => {
+  const beForLife = () => console.log("Please dont leave");
+  useBeforeLeave(beForLife);
+  return (
+    <div className="App">
+      <button onClick={enablePrevent}>Protect</button>
+      <button onClick={disablePrevent}>UnProtect</button>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useFadeIn
+
+useEffect
+
+```react
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+// useFadeIn은 duration과 delay를 매개변수로 각각 1, 0이 초기값이다.
+const useFadeIn = (duration = 1, delay = 0) => {
+    const element = useRef();
+    useEffect(() => {
+      if (element.current) {
+        const { current } = element;
+        // fade in 애니메이션 효과를 준다.
+        // duration과 delay값은 매개변수로 받은 값을 전달
+        current.style.transition = `opacity ${duration}s ease-in-out ${delay}s`;
+        current.style.opacity = 1;
+      }
+    }, []);
+    // duration과 delay의 타입이 number가 아니라면 
+    // 리턴값은 없다.
+    if (typeof duration !== 'number' || typeof delay !== 'number') {
+      return;
+    }
+    // ref는 element를 반환
+    // style은 opacity:0을 반환
+    return { ref: element, style: { opacity: 0 } };
+  };
+  
+  function App() {
+    // title과 content의 duaration과 dealy값을 설정
+    const fadeInTitle = useFadeIn(0.5, 1);
+    const fadeInContent = useFadeIn(1, 2);
+  
+    return (
+      <div className='app-box'>
+        <h1>Welcome to React Custom Hooks Page</h1>
+        <h2 {...fadeInTitle}>#7-1. useFadeIn</h2>
+        <div {...fadeInContent} className='app-content'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting
+          ... 
+          desktop publishing software like Aldus PageMaker including versions 
+          of Lorem Ipsum.
+        </div>
+      </div>
+    );
+  }
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useNetwork
+
+useEffect
+
+```react
+const useNetwork = (onChange) => {
+  // navigator.onLine은 온라인은 true, 오프라인은 false 값을 반환
+  // 오프라인 모드로 전환하거나, 브라우저가 더 이상 네트워크에 연결할 수 없을 때 갱신
+  const [status, setStatus] = useState(navigator.onLine);
+  const handleChange = () => {
+    if (typeof onChange === "function") {
+      onChange(navigator.onLine);
+    }
+    setStatus(navigator.onLine);
+  };
+  useEffect(() => {
+    window.addEventListener("online", handleChange);
+    window.addEventListener("offline", handleChange);
+    return () => {
+      window.removeEventListener("online", handleChange);
+      window.removeEventListener("offline", handleChange);
+    };
+  }, []);
+  console.log("status", status);
+  return status;
+};
+
+function App() {
+  const handleNetworkChange = (online) => {
+    console.log(online ? "online" : "offline");
+  };
+  const onLine = useNetwork(handleNetworkChange);
+  return (
+    <div className="app-box">
+      <h1>Welcome to React Custom Hooks Page</h1>
+      <h2>#7-2. useNetwork</h2>
+      <h3>{onLine ? "Online" : "Offline"}</h3>
+    </div>
+  );
+}
+
+export default App;
+
+```
+
+
+
+
+
+## useScroll
+
+useEffect
+
+``` react
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const useScroll = () => {
+  const [state, setState] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  // scroll 이벤트 발생시 state의 x값과 y값을 window.scroll값으로 업데이트 해준다.
+  const onScroll = () => {
+    setState({
+      x: window.scrollX,
+      y: window.scrollY,
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return state;
+};
+
+function App() {
+  const { y } = useScroll();
+  console.log("scrollY", y);
+  return (
+    <div className="app-box" style={{ height: "1000vh" }}>
+      {/* <h1>Welcome to React Custom Hooks Page</h1> */}
+      <h2 style={{ position: "fixed", color: y > 250 ? "red" : "blue" }}>
+        #8-1. useScroll
+      </h2>
+      <div></div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useFullScreen
+
+useEffect
+
+``` react
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const useFullscreen = (callback) => {
+  const element = useRef();
+  const runCb = (isFull) => {
+    if (callback && typeof callback === "function") {
+      callback(isFull);
+    }
+  };
+
+  // 브라우저마다 지원하는 API가 달라서 아래와 같이 여러 케이스에 따른 조건을 줬다.
+  const triggerFull = () => {
+    if (element.current) {
+      if (element.current.requestFullscreen) {
+        element.current.requestFullscreen();
+        //Firefox
+      } else if (element.current.mozRequestFullScreen) {
+        element.current.mozRequestFullScreen();
+        //Opera
+      } else if (element.current.webkitRequestFullscreen) {
+        element.current.webkitRequestFullscreen();
+        //MS
+      } else if (element.current.msRequestFullscreen) {
+        element.current.msRequestFullscreen();
+      }
+      runCb(true);
+    }
+  };
+
+  const exitFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    runCb(false);
+  };
+  return { element, triggerFull, exitFullscreen };
+};
+
+function App() {
+  const onFullScreen = (isFull) => {
+    console.log(isFull ? "We're full" : "We're small");
+  };
+  const { element, triggerFull, exitFullscreen } = useFullscreen(onFullScreen);
+
+  return (
+    <div className="app-box">
+      <h1>Welcome to React Custom Hooks Page</h1>
+      <h2>#8-2. useFullScreen</h2>
+      <div ref={element}>
+        <img src="url" />
+        <br />
+        <div className="btn-box">
+          <button onClick={triggerFull}>Go Fullscreen</button>
+          <button onClick={exitFullscreen}>Exit Fullscreen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+## useNotification
+
+useEffect
+
+``` react
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const useNotification = (title, options) => {
+  if (!"Notification" in window) {
+    return;
+  }
+  const fireNotification = () => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          new Notification(title, options);
+        } else {
+          return;
+        }
+      });
+    } else {
+      new Notification(title, options);
+    }
+  };
+  return fireNotification;
+};
+
+function App() {
+  const triggerNofication = useNotification("useNotification is working", {
+    body: "I'm learning Custom Hooks tutorial.",
+  });
+  return (
+    <div className="app-box">
+      <h1>Welcome to React Custom Hooks Page</h1>
+      <h2>#9. useNotification</h2>
+      <button onClick={triggerNofication}>click</button>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+```
+
+
+
+
+
+## useAxios
+
+useEffect
+
+``` reac
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+
+const useAxios = (opts, axiosInstance = axios) => {
+    const [state, setState] = useState({
+      loading: true,
+      error: null,
+      data: null,
+    });
+  
+    const [trigger, setTrigger] = useState(0);
+  
+    const refetch = () => {
+      setState({
+        ...state,
+        loading: true,
+      });
+      setTrigger(Date.now());
+    };
+  
+    useEffect(() => {
+      axiosInstance(opts)
+        .then((data) => {
+          setState({
+            ...state,
+            loading: false,
+            data,
+          });
+        })
+        .catch((error) => {
+          setState({
+            ...state,
+            loading: false,
+            error,
+          });
+        });
+    }, [trigger]);
+  
+    if (!opts.url) {
+      return;
+    }
+    return { ...state, refetch };
+  };
+  
+  function App() {
+    const { loading, error, data, refetch } = useAxios({
+      url: 'https://yts-proxy.now.sh/list_movies.json ',
+    });
+  
+    console.log(
+      `Loading: ${loading}, Error: ${error}, Data: ${JSON.stringify(data)},`
+    );
+  
+    return (
+      <div className='app-box' style={{ height: '1000vh' }}>
+        <h1>Welcome to React Custom Hooks Page</h1>
+        <h2>#10. useAxios</h2>
+        <h2>Data Status: {data && data.status}</h2>
+        <h2>{loading && 'Loading...'}</h2>
+        <button onClick={refetch}>Refech</button>
+      </div>
+    );
 ReactDOM.render(<App />, document.getElementById("root"));
 
 ```
